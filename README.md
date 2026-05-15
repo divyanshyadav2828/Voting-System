@@ -9,6 +9,15 @@ A highly secure, multi-tenant capable, and fully customizable Voting Web Applica
 
 ---
 
+## 📸 Screenshots
+
+<p align="center">
+  <img src="public/img/Screenshot (64).png" width="45%" alt="Login Screen" />
+  <img src="public/img/Screenshot (65).png" width="45%" alt="Dashboard" />
+</p>
+
+---
+
 ## 🚀 Core Features
 
 - **🔐 Dual-Layer Authentication**: 
