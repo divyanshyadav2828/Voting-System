@@ -1,0 +1,116 @@
+<%- include('../partials/header') %>
+
+<!-- Admin Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+  <div class="container">
+    <a class="navbar-brand" href="/vote_admin/dashboard">
+      <img src="<%= schoolLogo %>" alt="<%= schoolName %>" class="navbar-logo" onerror="this.style.display='none';">
+      <span class="brand-text">Admin Panel</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav" style="border-color: var(--border-glass);">
+      <i class="bi bi-list" style="color: var(--text-primary); font-size: 1.5rem;"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="adminNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/vote_admin/logout">
+            <i class="bi bi-box-arrow-right me-1"></i>Logout
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-content">
+  <div class="container" style="max-width: 720px;">
+    <!-- Back -->
+    <a href="/vote_admin/posts" class="btn-secondary-custom btn-sm-custom" style="margin-bottom: 1.5rem;">
+      <i class="bi bi-arrow-left"></i> Back to Posts
+    </a>
+
+    <div class="glass-card">
+      <h2 class="section-title" style="margin-bottom: 1.5rem;">
+        <i class="bi bi-<%= post ? 'pencil-square' : 'plus-circle' %> me-2" style="color: var(--accent-primary-light);"></i>
+        <%= post ? 'Edit Post' : 'Create Election Post' %>
+      </h2>
+
+      <% if (!post) { %>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">
+          Create a new voting position for the <%= schoolName %> elections (e.g. Head Boy, Head Girl, Sports Captain, Cultural Secretary).
+        </p>
+      <% } %>
+
+      <form action="<%= post ? '/vote_admin/posts/' + post._id + '?_method=PUT' : '/vote_admin/posts' %>" method="POST" enctype="multipart/form-data" onsubmit="renameFileInputs(this)">
+        <!-- Title -->
+        <div class="form-group">
+          <label for="title">Position Title <span style="color: var(--accent-danger);">*</span></label>
+          <input type="text" id="title" name="title" class="form-control-custom" placeholder="e.g. Head Boy, Head Girl, Sports Captain" value="<%= post ? post.title : '' %>" required>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" class="form-control-custom" rows="3" placeholder="Describe this position and its responsibilities..."><%= post ? post.description : '' %></textarea>
+        </div>
+
+        <!-- Active Toggle -->
+        <div class="form-group">
+          <label class="toggle-switch">
+            <input type="checkbox" name="isActive" id="isActive" <%= (!post || post.isActive) ? 'checked' : '' %>>
+            <span>Active (visible to voters for voting)</span>
+          </label>
+        </div>
+
+        <!-- Candidates -->
+        <div class="form-group">
+          <label>Candidates <span style="color: var(--accent-danger);">*</span></label>
+          <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.75rem;">
+            Add the names of candidates contesting for this position.
+          </p>
+          <div id="candidates-container">
+            <% if (post && post.candidates.length > 0) { %>
+              <% post.candidates.forEach((c, i) => { %>
+                <div class="candidate-input-row">
+                  <input type="text" name="candidateNames" class="form-control-custom" placeholder="Candidate name" value="<%= c.name %>" required>
+                  <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 4px; border: 1px solid var(--border-glass);">
+                    <% if (c.photo) { %>
+                      <img src="<%= c.photo %>" alt="Current" style="height: 30px; width: 30px; object-fit: cover; border-radius: 4px;">
+                    <% } %>
+                    <input type="file" name="candidatePhotos" accept="image/*" class="form-control-custom" style="padding: 4px; border: none; background: transparent; height: auto;">
+                    <input type="hidden" name="candidateOldPhotos" value="<%= c.photo %>">
+                  </div>
+                  <button type="button" class="remove-btn" onclick="removeCandidateRow(this)" title="Remove">×</button>
+                </div>
+              <% }) %>
+            <% } else { %>
+              <div class="candidate-input-row">
+                <input type="text" name="candidateNames" class="form-control-custom" placeholder="Candidate name" required>
+                <input type="file" name="candidatePhotos" accept="image/*" class="form-control-custom">
+                <button type="button" class="remove-btn" onclick="removeCandidateRow(this)" title="Remove">×</button>
+              </div>
+              <div class="candidate-input-row">
+                <input type="text" name="candidateNames" class="form-control-custom" placeholder="Candidate name" required>
+                <input type="file" name="candidatePhotos" accept="image/*" class="form-control-custom">
+                <button type="button" class="remove-btn" onclick="removeCandidateRow(this)" title="Remove">×</button>
+              </div>
+            <% } %>
+          </div>
+          <button type="button" class="btn-secondary-custom btn-sm-custom" onclick="addCandidateRow()" style="margin-top: 0.5rem;">
+            <i class="bi bi-plus-lg"></i> Add Candidate
+          </button>
+        </div>
+
+        <!-- Submit -->
+        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+          <button type="submit" class="btn-primary-custom">
+            <i class="bi bi-check-lg"></i> <%= post ? 'Update Post' : 'Create Post' %>
+          </button>
+          <a href="/vote_admin/posts" class="btn-secondary-custom">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

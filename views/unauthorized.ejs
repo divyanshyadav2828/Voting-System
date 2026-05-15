@@ -1,0 +1,25 @@
+<%- include('partials/header') %>
+
+<div class="unauthorized-wrapper">
+  <div class="unauthorized-card">
+    <div class="vg-logo-container" style="margin-bottom: 1rem;">
+      <img src="<%= schoolLogo %>" alt="<%= schoolName %>" class="vg-logo" style="height:40px;" onerror="this.style.display='none';">
+    </div>
+    <div class="error-icon">
+      <i class="bi bi-shield-x" style="color: #ef4444;"></i>
+    </div>
+    <h1 style="margin-bottom: 0.75rem;">Access Denied</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">
+      Your email domain is not authorized to use the <%= schoolName %> Voting Portal.
+    </p>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.9rem;">
+      Only accounts ending with <strong style="color: var(--accent-primary-light);">@<%= allowedDomain %></strong> are permitted to participate in school elections.
+    </p>
+    <a href="/login" class="btn-secondary-custom">
+      <i class="bi bi-arrow-left"></i>
+      Back to Login
+    </a>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

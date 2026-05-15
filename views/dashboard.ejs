@@ -1,0 +1,155 @@
+<%- include('partials/header') %>
+<style>
+.candidate-hover-zoom {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s, border-radius 0.3s;
+  position: relative;
+  z-index: 1;
+}
+.candidate-hover-zoom:hover {
+  transform: scale(4);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  border-radius: 12px;
+  z-index: 9999;
+}
+</style>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+  <div class="container">
+    <a class="navbar-brand" href="/dashboard">
+      <img src="<%= schoolLogo %>" alt="<%= schoolName %>" class="navbar-logo" onerror="this.style.display='none';">
+      <span class="brand-text">Voting Portal</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#voterNav" style="border-color: var(--border-glass);">
+      <i class="bi bi-list" style="color: var(--text-primary); font-size: 1.5rem;"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="voterNav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item">
+          <span class="nav-link user-badge" style="cursor: default;">
+            <div class="user-avatar-sm"><%= user.displayName.charAt(0).toUpperCase() %></div>
+            <span>
+              <%= user.displayName %>
+              <span class="user-email"><%= user.email %></span>
+            </span>
+          </span>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/auth/logout" id="btn-logout">
+            <i class="bi bi-box-arrow-right me-1"></i>Logout
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-content">
+  <div class="container">
+    <!-- Welcome Banner -->
+    <div class="welcome-banner glass-card" style="margin-bottom: 2rem;">
+      <div class="welcome-content">
+        <h1>
+          <span class="wave-emoji">👋</span>
+          Welcome, <span class="highlight-name"><%= user.displayName.split(' ')[0] %></span>!
+        </h1>
+        <p>Cast your vote for the upcoming <%= schoolName %> student council elections. Your voice matters — choose your leaders wisely.</p>
+      </div>
+      <div class="welcome-stats">
+        <div class="welcome-stat">
+          <span class="welcome-stat-value"><%= posts.length %></span>
+          <span class="welcome-stat-label">Active Posts</span>
+        </div>
+        <div class="welcome-stat">
+          <span class="welcome-stat-value"><%= votedPostIds.length %></span>
+          <span class="welcome-stat-label">Votes Cast</span>
+        </div>
+        <div class="welcome-stat">
+          <span class="welcome-stat-value"><%= posts.length - votedPostIds.length %></span>
+          <span class="welcome-stat-label">Remaining</span>
+        </div>
+      </div>
+    </div>
+
+    <% if (posts.length === 0) { %>
+      <div class="glass-card">
+        <div class="empty-state">
+          <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+          <h3>No Active Elections</h3>
+          <p>There are no active voting categories at the moment. Check back when the election period begins.</p>
+        </div>
+      </div>
+    <% } else { %>
+      <h2 class="section-title" style="margin-bottom: 1.25rem;">
+        <i class="bi bi-clipboard2-check me-2" style="color: var(--accent-primary-light);"></i>
+        Election Posts
+      </h2>
+      <% posts.forEach(post => { %>
+        <div class="post-card" id="post-<%= post._id %>">
+          <div class="post-card-header">
+            <h3><i class="bi bi-award me-2" style="color: var(--accent-warning);"></i><%= post.title %></h3>
+            <% if (votedPostIds.includes(post._id.toString())) { %>
+              <span class="badge badge-voted"><i class="bi bi-check-circle-fill me-1"></i>Voted</span>
+            <% } else { %>
+              <span class="badge badge-active"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>Open</span>
+            <% } %>
+          </div>
+          <div class="post-card-body">
+            <% if (post.description) { %>
+              <p class="description"><%= post.description %></p>
+            <% } %>
+
+            <% if (votedPostIds.includes(post._id.toString())) { %>
+              <div class="vote-cast-info">
+                <div class="check-icon"><i class="bi bi-check2"></i></div>
+                <span>You voted for <strong><%= voteMap[post._id.toString()] %></strong> — Thank you for participating!</span>
+              </div>
+            <% } else { %>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                <i class="bi bi-info-circle me-1"></i>Click on a candidate to cast your vote. This action cannot be undone.
+              </p>
+              <div class="candidate-list">
+                <% post.candidates.forEach(candidate => { %>
+                  <form action="/vote/<%= post._id %>" method="POST" style="margin:0;">
+                    <input type="hidden" name="candidateId" value="<%= candidate._id %>">
+                    <div class="candidate-option" onclick="if(confirm('Vote for <%= candidate.name %>? This cannot be undone.')) this.closest('form').submit();">
+                      <div class="candidate-info">
+                        <div class="candidate-avatar" onmouseover="this.style.zIndex='9999'" onmouseout="this.style.zIndex=''">
+                          <% if (candidate.photo) { %>
+                            <img src="<%= candidate.photo %>" alt="<%= candidate.name %>" class="candidate-hover-zoom">
+                          <% } else { %>
+                            <%= candidate.name.charAt(0).toUpperCase() %>
+                          <% } %>
+                        </div>
+                        <span class="candidate-name"><%= candidate.name %></span>
+                      </div>
+                      <button type="button" class="btn-success-custom btn-sm-custom vote-btn">
+                        <i class="bi bi-check2-circle"></i> Vote
+                      </button>
+                    </div>
+                  </form>
+                <% }) %>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="vg-site-footer">
+  <div class="container">
+    <div class="vg-footer-inner">
+      <img src="<%= schoolLogo %>" alt="<%= schoolName %>" class="footer-logo" onerror="this.style.display='none';">
+      <span><%= schoolName %> <%= schoolTagline %> — Election Management System</span>
+    </div>
+  </div>
+</footer>
+
+<%- include('partials/footer') %>

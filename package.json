@@ -1,0 +1,31 @@
+{
+  "name": "vidyagyan-voting-app",
+  "version": "1.0.0",
+  "description": "Secure Voting Web Application with Microsoft SSO and Admin Panel",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "create-admin": "node scripts/createAdmin.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^6.0.0",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^17.4.1",
+    "ejs": "^5.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "method-override": "^3.0.0",
+    "mongoose": "^9.4.1",
+    "multer": "^2.1.1",
+    "passport": "^0.7.0",
+    "passport-ldapauth": "^3.0.1",
+    "passport-local": "^1.0.0",
+    "passport-microsoft": "^2.1.0",
+    "socket.io": "^4.8.3"
+  }
+}

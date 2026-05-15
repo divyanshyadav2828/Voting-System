@@ -1,0 +1,136 @@
+<%- include('partials/header') %>
+
+<div style="min-height: 100vh; display: flex; flex-direction: column; background-color: var(--bg-color);">
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <i class="bi bi-terminal me-2"></i>Live System Logs
+      </a>
+      <% if (authenticated) { %>
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link text-danger" href="/logs/logout">
+              <i class="bi bi-box-arrow-right me-1"></i>Logout
+            </a>
+          </li>
+        </ul>
+      <% } %>
+    </div>
+  </nav>
+
+  <div class="container mt-5" style="flex: 1;">
+    <% if (!authenticated) { %>
+      <div class="row justify-content-center">
+        <div class="col-md-5">
+          <div class="glass-card" style="padding: 2.5rem; text-align: center;">
+            <div style="width: 60px; height: 60px; background: rgba(99, 102, 241, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem auto;">
+              <i class="bi bi-shield-lock" style="font-size: 1.5rem; color: var(--accent-primary);"></i>
+            </div>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Restricted Access</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.9rem;">
+              Enter your logs portal credentials to view live user sessions.
+            </p>
+
+            <% if (typeof logsError !== 'undefined' && logsError) { %>
+              <div class="alert alert-danger p-2" style="font-size: 0.9rem; border-radius: 8px;">
+                <i class="bi bi-exclamation-circle me-1"></i><%= logsError %>
+              </div>
+            <% } %>
+
+            <form action="/logs/login" method="POST">
+              <div class="mb-3 text-start">
+                <label class="form-label" style="font-size: 0.85rem; color: var(--text-secondary);">Username</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-transparent border-end-0">
+                    <i class="bi bi-person" style="color: var(--text-secondary);"></i>
+                  </span>
+                  <input type="text" class="form-control border-start-0 ps-0" name="username" required placeholder="Enter username">
+                </div>
+              </div>
+              <div class="mb-4 text-start">
+                <label class="form-label" style="font-size: 0.85rem; color: var(--text-secondary);">Password</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-transparent border-end-0">
+                    <i class="bi bi-key" style="color: var(--text-secondary);"></i>
+                  </span>
+                  <input type="password" class="form-control border-start-0 ps-0" name="password" required placeholder="Enter password">
+                </div>
+              </div>
+              <button type="submit" class="btn-primary-custom w-100" style="padding: 12px;">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Access Logs
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    <% } else { %>
+      <!-- Dashboard -->
+      <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+          <h2 style="color: var(--text-primary);"><i class="bi bi-activity me-2 text-success"></i>Active User Sessions</h2>
+          <p style="color: var(--text-secondary);">Auto-refreshing live view of connected users.</p>
+        </div>
+        <div>
+          <span class="badge badge-active" id="connection-status"><i class="bi bi-circle-fill me-1" style="font-size:0.5rem;"></i>Live Connection</span>
+        </div>
+      </div>
+
+      <div class="glass-card" style="padding: 0; overflow: hidden;">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th><i class="bi bi-person me-1"></i>User Details</th>
+              <th><i class="bi bi-hdd-network me-1"></i>IP Address</th>
+              <th><i class="bi bi-shield-check me-1"></i>Auth Method</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="logs-tbody">
+            <tr><td colspan="4" class="text-center py-4">Fetching active sessions...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <script src="/socket.io/socket.io.js"></script>
+      <script>
+        const socket = io();
+
+        socket.on('connect', () => {
+          document.getElementById('connection-status').className = 'badge badge-active';
+          document.getElementById('connection-status').innerHTML = '<i class="bi bi-circle-fill me-1" style="font-size:0.5rem;"></i>Live Connection';
+        });
+
+        socket.on('active_users', (data) => {
+          const tbody = document.getElementById('logs-tbody');
+
+          if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted">No active student sessions found.</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = '';
+          data.forEach(user => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>
+                <strong>${typeof user.displayName === 'string' ? user.displayName.replace(/</g, "&lt;").replace(/>/g, "&gt;") : 'Unknown'}</strong><br>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">${typeof user.username === 'string' ? user.username.replace(/</g, "&lt;").replace(/>/g, "&gt;") : 'Unknown'}</span>
+              </td>
+              <td><code style="background: var(--bg-input); padding: 4px 8px; border-radius: 4px; color: var(--accent-primary);">${user.ip}</code></td>
+              <td><span class="badge" style="background: rgba(99,102,241,0.1); color: var(--accent-primary);">${user.authMethod}</span></td>
+              <td><span class="badge badge-active"><i class="bi bi-broadcast me-1"></i>Online</span></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        });
+
+        socket.on('disconnect', () => {
+          document.getElementById('connection-status').className = 'badge badge-inactive';
+          document.getElementById('connection-status').innerHTML = '<i class="bi bi-x-circle me-1"></i>Disconnected';
+        });
+      </script>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

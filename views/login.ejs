@@ -1,0 +1,105 @@
+<%- include('partials/header') %>
+
+  <div class="login-wrapper">
+    <div class="login-card" style="max-width: 500px;">
+      <!-- School Logo -->
+      <div class="vg-logo-container">
+        <img src="<%= schoolLogo %>" alt="<%= schoolName %> Logo" class="vg-logo"
+          onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='flex';">
+        <div id="fallback-logo" class="logo-icon" style="display:none;">
+          <i class="bi bi-check2-square" style="color: #fff;"></i>
+        </div>
+      </div>
+      <h1><%= schoolName %> Voting Portal</h1>
+      <p class="vg-tagline"><%= schoolTagline %></p>
+
+      <!-- Login Method Tabs -->
+      <% if (enableMicrosoftLogin && enableLdapLogin) { %>
+        <div class="login-tabs">
+          <button class="login-tab active" onclick="switchTab('microsoft')" id="tab-microsoft">
+            <svg width="16" height="16" viewBox="0 0 21 21" fill="none" style="vertical-align: middle;">
+              <rect x="1" y="1" width="9" height="9" fill="#F25022" />
+              <rect x="11" y="1" width="9" height="9" fill="#7FBA00" />
+              <rect x="1" y="11" width="9" height="9" fill="#00A4EF" />
+              <rect x="11" y="11" width="9" height="9" fill="#FFB900" />
+            </svg>
+            Microsoft SSO
+          </button>
+          <button class="login-tab" onclick="switchTab('ldap')" id="tab-ldap">
+            <i class="bi bi-building"></i>
+            School LDAP
+          </button>
+        </div>
+      <% } %>
+
+      <% if (enableMicrosoftLogin) { %>
+        <!-- Microsoft SSO Panel -->
+        <div class="login-panel <%= (enableMicrosoftLogin) ? 'active' : '' %>" id="panel-microsoft">
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">
+            Sign in with your school Microsoft account to participate in the elections.
+          </p>
+          <a href="/auth/microsoft" class="btn-microsoft" id="btn-microsoft-login">
+            <svg width="20" height="20" viewBox="0 0 21 21" fill="none">
+              <rect x="1" y="1" width="9" height="9" fill="#F25022" />
+              <rect x="11" y="1" width="9" height="9" fill="#7FBA00" />
+              <rect x="1" y="11" width="9" height="9" fill="#00A4EF" />
+              <rect x="11" y="11" width="9" height="9" fill="#FFB900" />
+            </svg>
+            Sign in with Microsoft
+          </a>
+        </div>
+      <% } %>
+
+      <% if (enableLdapLogin) { %>
+        <!-- LDAP Login Panel -->
+        <div class="login-panel <%= (!enableMicrosoftLogin && enableLdapLogin) ? 'active' : '' %>" id="panel-ldap">
+          <p style="color: var(--text-secondary); margin-bottom: 1.25rem; font-size: 0.9rem;">
+            Sign in using your school network (LDAP/Active Directory) credentials.
+          </p>
+          <form action="/auth/ldap" method="POST" style="text-align: left;">
+            <div class="form-group">
+              <label for="ldap_username"><i class="bi bi-person me-1"></i>Username / Student ID</label>
+              <input type="text" id="ldap_username" name="ldap_username" class="form-control-custom"
+                placeholder="e.g. di4836 or student.name" required autocomplete="username">
+            </div>
+            <div class="form-group">
+              <label for="ldap_password"><i class="bi bi-key me-1"></i>Password</label>
+              <input type="password" id="ldap_password" name="ldap_password" class="form-control-custom"
+                placeholder="Enter your network password" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn-ldap" id="btn-ldap-login" style="width: 100%; justify-content: center;">
+              <i class="bi bi-box-arrow-in-right"></i> Sign In via LDAP
+            </button>
+          </form>
+        </div>
+      <% } %>
+
+      <% if (!enableMicrosoftLogin && !enableLdapLogin) { %>
+        <div class="alert alert-warning" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: var(--accent-warning); padding: 1.5rem; border-radius: 12px; margin: 1rem 0;">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          Voting is currently closed or login methods are disabled. Please contact the administrator.
+        </div>
+      <% } %>
+
+      <div class="vg-domain-note">
+        <i class="bi bi-shield-check"></i>
+        Only <strong>@<%= allowedDomain %></strong> accounts are permitted
+      </div>
+      <div class="vg-footer-branding">
+        <span>Developed By <a href="https://github.com/divyanshyadav2828/" target="_blank" style="color: var(--accent-primary-light); text-decoration: none; font-weight: 700;">Divyansh</a></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      // Tabs
+      document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      // Panels
+      document.querySelectorAll('.login-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + tab).classList.add('active');
+    }
+  </script>
+
+  <%- include('partials/footer') %>
