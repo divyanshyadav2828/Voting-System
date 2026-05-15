@@ -9,11 +9,14 @@ A highly secure, multi-tenant capable, and fully customizable Voting Web Applica
 
 ---
 
-## 📸 Screenshots
+## 📸 Preview & Aesthetics
+
+### ✨ Premium Dark Glassmorphism UI
+The portal features a state-of-the-art **Dark Mode** interface with **Glassmorphism** effects, providing a premium and modern user experience.
 
 <p align="center">
-  <img src="public/img/Screenshot (64).png" width="45%" alt="Login Screen" />
-  <img src="public/img/Screenshot (65).png" width="45%" alt="Dashboard" />
+  <img src="https://raw.githubusercontent.com/divyanshyadav2828/Voting-System/refs/heads/main/preview-img/Screenshot%20(65).png" width="45%" alt="Login Page" />
+  <img src="https://raw.githubusercontent.com/divyanshyadav2828/Voting-System/refs/heads/main/preview-img/Screenshot%20(64).png" width="45%" alt="Admin Dashboard" />
 </p>
 
 ---
@@ -68,8 +71,8 @@ A secure monitor for live system activity.
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/divyanshyadav2828/Vote_system.git
-   cd Vote_system
+   git clone https://github.com/divyanshyadav2828/Voting-System.git
+   cd Voting-System
    ```
 
 2. **Install Dependencies**:
